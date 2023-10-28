@@ -58,8 +58,8 @@ class _imagepickerstate extends State<imagepicker> {
         CircleAvatar(radius: 100,backgroundColor: Colors.blueGrey,foregroundImage:_pickedimagefile!=null?Image.memory(_pickedimagefile!) as ImageProvider:null,),
         TextButton.icon(
             onPressed: _pickimage,
-            icon: const Icon(Icons.image),
-            label: const Text('Add Image'))
+            icon: const Icon(Icons.image,color: Color.fromARGB(255, 125, 216, 197),),
+            label: const Text('Add Image',style: TextStyle(color: Color.fromARGB(255, 125, 216, 197),),))
       ],
     );
   }

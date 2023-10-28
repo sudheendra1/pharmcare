@@ -1,5 +1,7 @@
 
 
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -12,6 +14,7 @@ class Auth_method{
     required String username,
     required String emailid,
     required String password,
+    required bool Doctor,
 
 
 
@@ -30,6 +33,7 @@ class Auth_method{
           'Allergies': '',
           'DOB': '',
           'Diseases': '',
+          'is_doctor': Doctor
 
 
         });

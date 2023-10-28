@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pharmcare/home_page.dart';
 import 'package:pharmcare/signup.dart';
 
@@ -77,106 +78,112 @@ void submit()async {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0.0,
-        title: Text('Sign In',style: TextStyle(color: Colors.black87)),
-        backgroundColor: Color.fromARGB(100, 125, 216, 197),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Form(
-          key: _formkey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/symbol-of-caduceus.jpg', height: 120),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: em,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[300],
-                  labelText: 'Email ID',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-                textCapitalization: TextCapitalization.none,
-                validator: (value) {
-                  if (value == null ||
-                      value.isEmpty ||
-                      !value.contains('@')) {
-                    return 'Please enter a valid Email Address';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _enteredemail = value!;
-                },
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: pass,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[300],
-                  labelText: 'Password',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-                autocorrect: false,
-                textCapitalization: TextCapitalization.none,
-                validator: (value) {
-                  if (value == null ||
-                      value.isEmpty ||
-                      value.trim().length < 8) {
-                    return 'Password must be atleast 8 characters long';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _enteredpassword = value!;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(onPressed: submit, child:_isloading?const Center(child: CircularProgressIndicator(color: Colors.purpleAccent,),): Text('Sign In',style: TextStyle(color: Colors.black),),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(100, 125, 216, 197),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+    return WillPopScope(
+      onWillPop: ()async{SystemNavigator.pop();
+        return true;},
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          elevation: 0.0,
+          title: Text('Sign In',style: TextStyle(color: Colors.black87)),
+          backgroundColor: Color.fromARGB(100, 125, 216, 197),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Form(
+              key: _formkey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/logo.png', height: 200),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: em,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[300],
+                      labelText: 'Email ID',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
+                      prefixIcon: Icon(Icons.email),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !value.contains('@')) {
+                        return 'Please enter a valid Email Address';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _enteredemail = value!;
+                    },
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),),
-              SizedBox(height: 20),
-              ElevatedButton.icon(
-                icon: Image.asset("assets/images/google_logo.png", height: 24.0), // Adjust this path
-                label: Text("Sign in with Google"),
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black, backgroundColor: Colors.white,
-                ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: pass,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[300],
+                      labelText: 'Password',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
+                      prefixIcon: Icon(Icons.lock),
+                    ),
+                    obscureText: true,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    validator: (value) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().length < 8) {
+                        return 'Password must be atleast 8 characters long';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _enteredpassword = value!;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(onPressed: submit, child:_isloading?const Center(child: CircularProgressIndicator(color: Colors.purpleAccent,),): Text('Sign In',style: TextStyle(color: Colors.black),),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(100, 125, 216, 197),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    ),),
+                  SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    icon: Image.asset("assets/images/google_logo.png", height: 24.0), // Adjust this path
+                    label: Text("Sign in with Google"),
+                    onPressed: (){},
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black, backgroundColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    icon: Image.asset("assets/images/Facebook.png", height: 24.0), // Adjust this path
+                    label: Text("Sign in with Facebook"),
+                    onPressed: (){},
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white, backgroundColor: Colors.blueAccent,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Signup()));
+                    },
+                    child: Text('Don\'t have an account? Sign Up'),
+                  )
+                ],
               ),
-              SizedBox(height: 16),
-              ElevatedButton.icon(
-                icon: Image.asset("assets/images/-11595933110pkgm1trcyf.png", height: 24.0), // Adjust this path
-                label: Text("Sign in with Facebook"),
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: Colors.blueAccent,
-                ),
-              ),
-              SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Signup()));
-                },
-                child: Text('Don\'t have an account? Sign Up'),
-              )
-            ],
+            ),
           ),
         ),
       ),

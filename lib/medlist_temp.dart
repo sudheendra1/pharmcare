@@ -24,7 +24,7 @@ class _medtempstate extends State<medtemp>{
       child: Card(
         child: Center(
           heightFactor: 3,
-          child: Text(widget.medicine['product_name']),
+          child: Text(widget.medicine['product_name'],style: TextStyle(fontFamily: 'Tommy'),),
         ),
       ),
     );

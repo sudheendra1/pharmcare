@@ -35,10 +35,12 @@ class _FaiditemState extends State<Faiditem> {
             ));
              },
               child: Card(
+
+                color: Color.fromARGB(100, 125, 216, 197),
               child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                            child:
-                         Text(widget.snap['name'],overflow: TextOverflow.ellipsis,)
+                         Center(child: Text(widget.snap['name'],overflow: TextOverflow.ellipsis,style: TextStyle(fontFamily: 'Tommy',fontSize: 18),))
 
                         ),
                      ),

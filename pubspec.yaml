@@ -41,10 +41,12 @@ dependencies:
   firebase_core: ^2.16.0
   firebase_auth: ^4.10.0
   intl: ^0.18.1
-  uuid: ^3.0.7
   flutter_barcode_scanner: ^2.0.0
   youtube_player_flutter: ^8.1.2
   http: ^1.1.0
+  google_fonts: ^6.1.0
+  google_nav_bar: ^5.0.6
+  uuid: ^4.1.0
 
 
 
@@ -52,12 +54,21 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/main logo.png"
+  min_sdk_android: 21
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -73,21 +84,23 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/images/google_logo.png
-     - assets/images/symbol-of-caduceus.jpg
-     - assets/images/-11595933110pkgm1trcyf.png
-     - assets/images/img.png
-     - assets/images/img_1.png
-     - assets/images/img_2.png
-     - assets/images/img_3.png
-     - assets/images/img_4.png
-     - assets/images/img_5.png
-     - assets/images/img_6.png
-     - assets/images/img_7.png
-     - assets/images/img_8.png
-     - assets/images/img_9.png
-     - assets/images/img_10.png
-     - assets/images/Sucking_leech.jpg
-     - assets/images/img_11.png
+     - assets/images/Facebook.png
+     - assets/images/Medicines.png
+     - assets/images/Doc.png
+     - assets/images/First_aid.png
+     - assets/images/CPR.png
+     - assets/images/Cuts&Grazes.png
+     - assets/images/Burn.png
+     - assets/images/Bee_sting.png
+     - assets/images/Sprain.png
+     - assets/images/Splinters.png
+     - assets/images/Animal_bites.png
+     - assets/images/Leech.png
+     - assets/images/Nosebleeds.png
+     - assets/images/main logo.png
+     - assets/images/logo.png
+     - assets/images/Patient.png
+     - assets/images/Transparent_logo.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -101,17 +114,17 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+     - family: Cocogoose
+       fonts:
+         - asset: assets/fonts/Cocogoose Pro Semilight-trial.ttf
+         - asset: assets/fonts/Cocogoose Pro-trial.ttf
+     - family: Tommy
+       fonts:
+         - asset: assets/fonts/MADE TOMMY ExtraBold_PERSONAL USE.otf
+     - family: Tommy_reg
+       fonts:
+         - asset: assets/fonts/MADE TOMMY Regular_PERSONAL USE.otf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

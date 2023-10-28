@@ -30,7 +30,7 @@ theme: ThemeData(useMaterial3: true),
               return const Splashscreen();
             }
             if(snapshot.hasData){
-              return const Homepage();
+              return const Splashscreen();
             }
             return const Loginpage();
           }),
