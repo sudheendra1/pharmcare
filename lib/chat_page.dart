@@ -1,10 +1,16 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pharmcare/Doctor.dart';
 import 'package:pharmcare/chat_bubble.dart';
 import 'package:pharmcare/chat_service.dart';
+import 'package:pharmcare/message_model.dart';
+import 'package:pharmcare/pick_image.dart';
 
 class chat_page extends StatefulWidget {
   const chat_page(
@@ -23,11 +29,15 @@ class chat_page extends StatefulWidget {
 }
 
 class _chatpagestate extends State<chat_page>{
+  var selectedMessage;
   final TextEditingController msgcontroller = TextEditingController();
   final chatservice _chatservice= chatservice();
   final FirebaseAuth _firebaseAuth= FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String username="username";
+  String imageUrl='';
+  String reply='';
+  String? replyImageUrl;
 
   void initState() {
     super.initState();
@@ -37,7 +47,11 @@ class _chatpagestate extends State<chat_page>{
   fetchData() async {
     _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get().then((value){
       setState(() {
-        username=value.data()?['username'];
+        var data = value.data();
+        if (data != null) {
+          username = data['username'] ?? "User";
+        }
+
 
       });
     });
@@ -46,8 +60,20 @@ class _chatpagestate extends State<chat_page>{
 
   void sendmessage()async{
     if(msgcontroller.text.isNotEmpty){
-      await _chatservice.sendmessage(widget.receiveruserid, msgcontroller.text,widget.doc_name,widget.pat_name==null?"patient":widget.pat_name,username);
+      var messageToReplyTo;
+      if (selectedMessage != null) {
+        var messageData = selectedMessage;
+        if (messageData != null) {
+          messageToReplyTo = messageData['message'];
+        }
+      }
+      await _chatservice.sendmessage(widget.receiveruserid, msgcontroller.text, widget.doc_name, widget.pat_name ?? "patient", username, replyImageUrl ?? messageToReplyTo, imageUrl!);
+
       msgcontroller.clear();
+      setState(() {
+        selectedMessage = null;
+        replyImageUrl = null;
+      });
     }
 
 }
@@ -96,34 +122,132 @@ class _chatpagestate extends State<chat_page>{
     var alignment = (data['SenderId']==_firebaseAuth.currentUser!.uid)
     ?Alignment.centerRight:
         Alignment.centerLeft;
-    return Container(
-      alignment: alignment,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
-        child: Column(
-          crossAxisAlignment: (data['SenderId']==_firebaseAuth.currentUser!.uid)?CrossAxisAlignment.end:CrossAxisAlignment.start,
-          children: [Text(data['SenderName']),
-          SizedBox(height: 4,),
-          chatbubble(message: data['message'])],
+    Widget messageContent;
+    if (data['imageUrl'] != null && data['imageUrl'].isNotEmpty) {
+      messageContent = chatbubble(isSender: data['SenderId'] == _firebaseAuth.currentUser!.uid, message: data['imageUrl']);
+
+    } else {
+      messageContent = chatbubble(isSender: data['SenderId'] == _firebaseAuth.currentUser!.uid, message: data['message']);
+
+    }
+    List<Widget> messageWidgets = [Text(data['SenderName'])];
+
+    if (data['replyTo'] != null && data['replyTo'].isNotEmpty) {
+
+      bool isReplyToImage = data['replyTo'].startsWith('http://') || data['replyTo'].startsWith('https://');
+
+      Widget replyContent = isReplyToImage
+          ? Image.network(data['replyTo'], width: 50, height: 50, fit: BoxFit.cover)
+          : Text("Replying to: ${data['replyTo']}");
+
+      messageWidgets.add(
+          Container(
+              margin: EdgeInsets.only(top: 4, bottom: 4),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              color: Colors.grey[200],
+              child: replyContent
+          )
+      );
+    }
+    messageWidgets.add(SizedBox(height: 4,));
+    messageWidgets.add(messageContent);
+    return GestureDetector(
+      onHorizontalDragEnd: (DragEndDetails details) {
+        setState(() {
+          selectedMessage = data;
+          if (data['imageUrl'] != null && data['imageUrl'].isNotEmpty) {
+            replyImageUrl = data['imageUrl'];
+          } else {
+            replyImageUrl = null;
+          }
+        });
+      },
+      child: Container(
+        alignment: alignment,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+          child: Column(
+            crossAxisAlignment: (data['SenderId']==_firebaseAuth.currentUser!.uid)?CrossAxisAlignment.end:CrossAxisAlignment.start,
+            children: messageWidgets,/*[Text(data['SenderName']),
+            SizedBox(height: 4,),
+            messageContent,
+            ],*/
+          ),
         ),
       ),
     );
   }
   Widget _buildMessageinput(){
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25,),
-      child: Row(children: [
-        Expanded(child: TextField(
-          controller: msgcontroller,
-        decoration: InputDecoration(hintText: 'Enter message'),
+    var selectedMessageData = selectedMessage as Map<String, dynamic>?;
+    return Column(
+      children: [
+        if (selectedMessage != null) ...[
+          ListTile(
+            title: Text(selectedMessage['SenderName'] ?? ''),
+            subtitle: (selectedMessage['imageUrl'] != null && selectedMessage['imageUrl'].isNotEmpty)
+                ? Image.network(selectedMessage['imageUrl'])
+                : Text(selectedMessage['message'] ?? ''),
+            trailing: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                setState(() {
+                  selectedMessage = null;
+                });
+              },
+            ),
+          ),
+          Divider()
+        ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25,),
+          child: Row(children: [
+            IconButton(
+              icon: Icon(Icons.image),
+              onPressed: () async {
+                final bytes = await Pickimage(ImageSource.gallery);
+                if (bytes != null) {
+                  sendImageMessage(bytes);
+                }
+              },
+            ),
+            Expanded(child: TextField(
+              controller: msgcontroller,
+            decoration: InputDecoration(hintText: 'Enter message'),
 
-        obscureText:false,
+            obscureText:false,
+            ),
+          ),
+            IconButton(onPressed: sendmessage, icon: Icon(Icons.arrow_upward,size: 40,))
+          ],
+          ),
         ),
-      ),
-        IconButton(onPressed: sendmessage, icon: Icon(Icons.arrow_upward,size: 40,))
       ],
-      ),
     );
   }
+
+  Future<String> uploadImageToFirebaseStorage(Uint8List bytes) async {
+    String filePath = 'chat_images/${DateTime.now().toIso8601String()}.png';
+    await FirebaseStorage.instance.ref(filePath).putData(bytes);
+    return FirebaseStorage.instance.ref(filePath).getDownloadURL();
+  }
+
+  void sendImageMessage(Uint8List bytes) async {
+    String? uploadedImageUrl = await uploadImageToFirebaseStorage(bytes);
+    if (uploadedImageUrl != null) {
+      // Use the uploadedImageUrl as the message or a field in the message
+      await _chatservice.sendmessage(
+          widget.receiveruserid,
+          "Image",
+          widget.doc_name,
+          widget.pat_name ?? "patient",
+          username,
+          replyImageUrl ?? "",
+          uploadedImageUrl
+      );
+    }
+
+
+  }
+
 
 }

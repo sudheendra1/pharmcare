@@ -6,8 +6,10 @@ class Message {
   final String recieverId;
   final String message;
   final Timestamp timestamp;
+  final String imageurl;
+  final String? replyTo;
 
-  Message({required this.senderId,required this.recieverId,required this.message,required this.timestamp,required this.username});
+  Message({required this.senderId,required this.recieverId,required this.message,required this.timestamp,required this.username,required this.imageurl,required this.replyTo,});
 
   Map<String,dynamic> toMap(){
     return{
@@ -16,6 +18,8 @@ class Message {
       'RecieverId': recieverId,
       'message': message,
       'timestamp': timestamp,
+      'imageUrl': imageurl,
+      'replyTo': replyTo,
     };
   }
 
