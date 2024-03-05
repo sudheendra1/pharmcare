@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:pharmcare/Doctor.dart';
 import 'package:pharmcare/Medicines_info.dart';
 import 'package:pharmcare/Search.dart';
@@ -31,6 +35,11 @@ class _homepagestate extends State<Homepage> {
   final FirebaseAuth _firebaseAuth= FirebaseAuth.instance;
   int _currentindex=0;
   String? Scanresult;
+
+  late StreamSubscription subscription;
+  var isdeviceconnected=false;
+  bool isalertset= false;
+
   Future scanbarcode()async{
 
     try{
@@ -51,13 +60,16 @@ class _homepagestate extends State<Homepage> {
   FocusNode _focusNode = FocusNode();
   @override
   void dispose() {
+    subscription.cancel();
     _focusNode.dispose();
     super.dispose();
   }
   @override
   void initState() {
     super.initState();
+    getConnectivity();
     fetchData();
+
   }
   fetchData() async {
     _firestore.collection("users").doc(_firebaseAuth.currentUser!.uid).get().then((value){
@@ -69,6 +81,50 @@ class _homepagestate extends State<Homepage> {
     });
 
   }
+
+  getConnectivity(){
+    subscription=Connectivity().onConnectivityChanged.listen((result) async {
+      isdeviceconnected = await InternetConnectionChecker().hasConnection;
+      if(!isdeviceconnected && isalertset==false){
+        showdialogbox();
+        setState(() {
+          isalertset=true;
+        });
+
+      }
+    },);
+  }
+
+  showdialogbox(){
+    showDialog<bool>(context: context, builder: (context){
+      return AlertDialog(
+        title: const Text('NO CONNECTION'),
+        content: const Text('Please check your internet connection'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context, false);
+              setState(() {
+                isalertset=false;
+
+              });
+              isdeviceconnected=await InternetConnectionChecker().hasConnection;
+              if(!isdeviceconnected){
+                showdialogbox();
+                setState(() {
+                  isalertset=true;
+                });
+              }
+            },
+            child: const Text('OK', style: TextStyle(color: Colors.black),),
+          ),
+
+        ],
+      );
+    },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
